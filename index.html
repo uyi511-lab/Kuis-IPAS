@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesmen Sumatif IPAS Kelas 4 - Game Kuis Interaktif</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 100%);
+            min-height: 100vh;
+        }
+        .custom-shadow {
+            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.15), 0 8px 10px -6px rgba(14, 165, 233, 0.1);
+        }
+        .option-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased flex flex-col justify-between min-h-screen">
+
+    <!-- Header / Navbar -->
+    <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 text-white p-2.5 rounded-xl flex items-center justify-center shadow-md">
+                    <i class="fa-solid fa-graduation-cap text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight text-slate-800">Kuis IPAS Kelas IV</h1>
+                    <p class="text-xs text-slate-500 font-medium">Asesmen Sumatif Semester Ganjil (Bab 1 - 4)</p>
+                </div>
+            </div>
+            <div id="header-badge" class="hidden sm:flex items-center gap-2 bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-lg text-xs font-semibold text-indigo-700">
+                <i class="fa-solid fa-book-open"></i> 40 Soal PG
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-4xl w-full mx-auto p-4 my-4 flex-grow">
+
+        <!-- WELCOME SCREEN -->
+        <section id="welcome-screen" class="glass-card rounded-2xl p-6 sm:p-10 custom-shadow border border-white text-center">
+            <div class="inline-block p-4 bg-emerald-100 text-emerald-600 rounded-full mb-4">
+                <i class="fa-solid fa-gamepad text-4xl"></i>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mb-2">Petualangan Sains & Sosial IPAS!</h2>
+            <p class="text-slate-600 mb-6 max-w-xl mx-auto text-sm sm:text-base">
+                Uji pemahamanmu mengenai Energi, Fotosintesis, Gaya, Peta, Bentang Alam, hingga Perubahan Iklim. Siapkan dirimu!
+            </p>
+
+            <!-- Form Identity -->
+            <div class="max-w-md mx-auto bg-slate-50 p-5 rounded-xl border border-slate-200 mb-6 text-left space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nama Lengkap Siswa</label>
+                    <input type="text" id="student-name" placeholder="Masukkan nama kamu..." class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Kelas / Nomor Absen</label>
+                    <input type="text" id="student-class" placeholder="Contoh: IV-A / 12" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Pilih Mode Pengerjaan</label>
+                    <select id="quiz-mode" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium bg-white">
+                        <option value="practice">Santai (Umpan Balik Langsung & Tanpa Waktu)</option>
+                        <option value="exam">Ujian (Waktu 40 Menit & Nilai Akhir)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="startQuiz()" class="w-full sm:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg hover:shadow-indigo-500/30 transition-all text-base flex items-center justify-center gap-2 mx-auto">
+                <i class="fa-solid fa-play"></i> Mulai Kerjakan Soal
+            </button>
+        </section>
+
+        <!-- QUIZ CONTAINER -->
+        <section id="quiz-screen" class="hidden glass-card rounded-2xl p-5 sm:p-8 custom-shadow border border-white">
+            
+            <!-- Quiz Header Info -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-slate-200">
+                <div>
+                    <span id="question-category" class="inline-block px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold tracking-wide mb-1">
+                        Kategori Soal
+                    </span>
+                    <h3 class="font-bold text-slate-700 text-sm">Soal <span id="current-question-num">1</span> dari 40</h3>
+                </div>
+
+                <!-- Progress & Timer -->
+                <div class="flex items-center gap-4 w-full sm:w-auto justify-between">
+                    <div id="timer-box" class="hidden items-center gap-2 bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-sm font-bold">
+                        <i class="fa-solid fa-clock"></i> <span id="timer-text">40:00</span>
+                    </div>
+                    <div class="w-32 bg-slate-200 rounded-full h-2.5">
+                        <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 2.5%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="mb-6">
+                <h2 id="question-text" class="text-base sm:text-lg font-bold text-slate-800 leading-relaxed">
+                    Teks Pertanyaan...
+                </h2>
+            </div>
+
+            <!-- Options Grid -->
+            <div id="options-container" class="grid grid-cols-1 gap-3 mb-6">
+                <!-- Options generated via JS -->
+            </div>
+
+            <!-- Instant Feedback Box (Practice Mode) -->
+            <div id="feedback-box" class="hidden mb-6 p-4 rounded-xl text-sm border">
+                <div id="feedback-title" class="font-bold flex items-center gap-2 mb-1"></div>
+                <p id="feedback-text" class="text-slate-700"></p>
+            </div>
+
+            <!-- Navigation Controls -->
+            <div class="flex justify-between items-center pt-4 border-t border-slate-200">
+                <button id="btn-prev" onclick="prevQuestion()" disabled class="px-4 py-2 bg-slate-100 hover:bg-slate-200 disabled:opacity-50 text-slate-600 font-semibold rounded-lg text-sm transition">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Sebelum
+                </button>
+                <div class="flex gap-2">
+                    <button id="btn-next" onclick="nextQuestion()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-sm shadow transition flex items-center gap-2">
+                        Berikutnya <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <button id="btn-finish" onclick="confirmFinish()" class="hidden px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-sm shadow transition flex items-center gap-2">
+                        <i class="fa-solid fa-check-circle"></i> Selesai
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- RESULT SCREEN -->
+        <section id="result-screen" class="hidden glass-card rounded-2xl p-6 sm:p-10 custom-shadow border border-white text-center">
+            <div id="score-badge" class="w-24 h-24 rounded-full mx-auto flex items-center justify-center text-3xl font-extrabold text-white shadow-lg mb-4 bg-emerald-500">
+                100
+            </div>
+            <h2 id="result-title" class="text-2xl font-bold text-slate-800 mb-1">Hasil Luar Biasa!</h2>
+            <p id="result-subtitle" class="text-slate-600 text-sm mb-6">Kamu telah menyelesaikan seluruh 40 Soal IPAS.</p>
+
+            <!-- Detail Statistics -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-lg mx-auto mb-6">
+                <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
+                    <span class="block text-xs font-bold text-slate-500 uppercase">Siswa</span>
+                    <span id="res-name" class="font-bold text-slate-800 text-sm truncate block">-</span>
+                </div>
+                <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl">
+                    <span class="block text-xs font-bold text-emerald-600 uppercase">Benar</span>
+                    <span id="res-correct" class="font-bold text-emerald-700 text-base">0</span>
+                </div>
+                <div class="bg-red-50 border border-red-200 p-3 rounded-xl">
+                    <span class="block text-xs font-bold text-red-600 uppercase">Salah</span>
+                    <span id="res-wrong" class="font-bold text-red-700 text-base">0</span>
+                </div>
+                <div class="bg-blue-50 border border-blue-200 p-3 rounded-xl">
+                    <span class="block text-xs font-bold text-blue-600 uppercase">Nilai (0-100)</span>
+                    <span id="res-score" class="font-bold text-blue-700 text-base">0</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap justify-center gap-3 mb-8">
+                <button onclick="toggleReviewModal()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-sm shadow transition flex items-center gap-2">
+                    <i class="fa-solid fa-list-check"></i> Pembahasan Soal
+                </button>
+                <button onclick="window.print()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-800 text-white font-bold rounded-xl text-sm shadow transition flex items-center gap-2">
+                    <i class="fa-solid fa-print"></i> Cetak Hasil
+                </button>
+                <button onclick="restartQuiz()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm shadow transition flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Coba Lagi
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- REVIEW MODAL -->
+    <div id="review-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex justify-center items-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl">
+            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+                <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-book-open text-indigo-600"></i> Kunci Jawaban & Pembahasan
+                </h3>
+                <button onclick="toggleReviewModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold px-2">
+                    &times;
+                </button>
+            </div>
+            <div id="review-content" class="p-6 overflow-y-auto space-y-6 flex-grow">
+                <!-- Review list injected by JS -->
+            </div>
+            <div class="p-4 border-t border-slate-200 text-right bg-slate-50 rounded-b-2xl">
+                <button onclick="toggleReviewModal()" class="px-5 py-2 bg-slate-700 text-white font-bold rounded-lg text-sm">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="w-full bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-500">
+        Asesmen Sumatif IPAS Kelas IV • Hak Cipta Kurikulum Merdeka
+    </footer>
+
+    <!-- Quiz Logic & Data Script -->
+    <script>
+        // 40 SOAL LENGKAP IPAS KELAS IV (BAB 1 - 4)
+        const questionsData = [
+            // Bab 1 & 2: Energi & Fotosintesis
+            {
+                id: 1,
+                category: "Bab 1: Perubahan Energi",
+                question: "Ketika Banu merasa kedinginan saat hujan, ia menggosokkan kedua telapak tangannya secara cepat hingga terasa hangat. Perubahan bentuk energi yang terjadi pada peristiwa tersebut adalah ...",
+                options: [
+                    "energi kimia menjadi energi listrik",
+                    "energi gerak menjadi energi panas",
+                    "energi listrik menjadi energi cahaya",
+                    "energi panas menjadi energi gerak"
+                ],
+                answer: 1,
+                explanation: "Menggosokkan tangan memanfaatkan energi gerak tubuh untuk menghasilkan gesekan yang menimbulkan energi panas."
+            },
+            {
+                id: 2,
+                category: "Bab 1: Perubahan Energi",
+                question: "Saat listrik padam di malam hari, penanak nasi tidak dapat digunakan untuk memasak. Perubahan energi yang dimanfaatkan pada alat penanak nasi saat listrik menyala adalah ...",
+                options: [
+                    "energi listrik menjadi energi panas",
+                    "energi panas menjadi energi kimia",
+                    "energi kimia menjadi energi gerak",
+                    "energi gerak menjadi energi listrik"
+                ],
+                answer: 0,
+                explanation: "Penanak nasi (rice cooker) mengubah energi listrik dari stopkontak menjadi energi panas pada elemen pemanasnya."
+            },
+            {
+                id: 3,
+                category: "Bab 1: Perubahan Energi",
+                question: "Bensin merupakan bahan bakar yang digunakan agar kendaraan bermotor dapat melaju di jalan raya. Perubahan energi yang terjadi pada kendaraan bermotor tersebut adalah ...",
+                options: [
+                    "energi listrik menjadi energi bunyi",
+                    "energi kimia menjadi energi gerak",
+                    "energi panas menjadi energi kimia",
+                    "energi cahaya menjadi energi listrik"
+                ],
+                answer: 1,
+                explanation: "Bensin menyimpan energi kimia. Saat dibakar di mesin, energi kimia ini diubah menjadi energi gerak (kinetik) untuk menggerakkan roda."
+            },
+            {
+                id: 4,
+                category: "Bab 1: Fotosintesis",
+                question: "Tumbuhan memerlukan beberapa bahan utama dari lingkungan untuk melakukan proses fotosintesis. Tiga komponen utama yang dibutuhkan tumbuhan tersebut adalah ...",
+                options: [
+                    "cahaya matahari, air, dan karbon dioksida",
+                    "pupuk, oksigen, dan tanah",
+                    "cahaya matahari, tanah, dan oksigen",
+                    "air, pupuk, dan nitrogen"
+                ],
+                answer: 0,
+                explanation: "Fotosintesis membutuhkan air (H2O), karbon dioksida (CO2), dan dibantu energi cahaya matahari."
+            },
+            {
+                id: 5,
+                category: "Bab 1: Fotosintesis",
+                question: "Proses fotosintesis merupakan contoh perubahan bentuk energi pada tumbuhan. Perubahan energi yang terjadi selama proses fotosintesis adalah ...",
+                options: [
+                    "energi gerak menjadi energi listrik",
+                    "energi cahaya matahari menjadi energi kimia",
+                    "energi kimia menjadi energi panas",
+                    "energi panas menjadi energi gerak"
+                ],
+                answer: 1,
+                explanation: "Fotosintesis menyerap energi cahaya dari matahari dan mengubahnya menjadi energi kimia tersimpan dalam bentuk karbohidrat/glukosa."
+            },
+            {
+                id: 6,
+                category: "Bab 1: Fotosintesis",
+                question: "Tanaman yang diletakkan di dalam wadah tertutup rapat tanpa mendapat sinar matahari akan mengalami gangguan fotosintesis sehingga daunnya menjadi layu. Hal ini membuktikan bahwa ...",
+                options: [
+                    "tumbuhan tidak membutuhkan air untuk hidup",
+                    "cahaya matahari sangat penting untuk pembuatan makanan pada tumbuhan",
+                    "tumbuhan dapat membuat makanan sendiri di tempat yang gelap",
+                    "karbon dioksida tidak memengaruhi fotosintesis"
+                ],
+                answer: 1,
+                explanation: "Tanpa sinar matahari, fotosintesis tidak dapat berlangsung sehingga tumbuhan tidak mendapat energi makanan dan melayu."
+            },
+            {
+                id: 7,
+                category: "Bab 1: Perubahan Energi",
+                question: "Manusia tidak dapat menciptakan energi baru. Alasan utama manusia melakukan perubahan bentuk energi adalah ...",
+                options: [
+                    "agar energi habis dengan cepat",
+                    "untuk memanfaatkan energi secara optimal sesuai kebutuhan hidup",
+                    "karena energi alam tidak dapat disentuh",
+                    "untuk mengurangi jumlah energi di bumi"
+                ],
+                answer: 1,
+                explanation: "Menurut Hukum Kekekalan Energi, energi tidak bisa diciptakan, melainkan diubah ke bentuk lain agar bermanfaat sesuai kebutuhan manusia."
+            },
+            {
+                id: 8,
+                category: "Bab 1: Pembangkit Listrik",
+                question: "Pembangkit Listrik Tenaga Air (PLTA) memanfaatkan aliran air yang deras untuk menggerakkan turbin dan generator. Perubahan energi utama yang terjadi pada PLTA adalah ...",
+                options: [
+                    "energi kimia menjadi energi gerak",
+                    "energi gerak (kinetik) menjadi energi listrik",
+                    "energi listrik menjadi energi cahaya",
+                    "energi panas menjadi energi kimia"
+                ],
+                answer: 1,
+                explanation: "Aliran air (energi kinetik/gerak) memutar turbin dan generator untuk menghasilkan energi listrik."
+            },
+            {
+                id: 9,
+                category: "Bab 1: Pembangkit Listrik",
+                question: "Jenis pembangkit listrik yang mengubah energi cahaya dan panas matahari secara langsung menjadi energi listrik melalui panel surya dinamakan ...",
+                options: [
+                    "PLTU",
+                    "PLTA",
+                    "PLTS",
+                    "PLTN"
+                ],
+                answer: 2,
+                explanation: "PLTS (Pembangkit Listrik Tenaga Surya) menggunakan modul sel surya untuk mengubah radiasi cahaya matahari menjadi listrik."
+            },
+
+            // Bab 2: Gaya & Pengaruhnya
+            {
+                id: 10,
+                category: "Bab 2: Gaya",
+                question: "Ketika Ian melempar bola basket ke arah keranjang, ia menggunakan dorongan dari tangan dan lengannya. Jenis gaya yang bekerja saat melempar bola tersebut adalah ...",
+                options: [
+                    "gaya gesek",
+                    "gaya otot",
+                    "gaya magnet",
+                    "gaya pegas"
+                ],
+                answer: 1,
+                explanation: "Gaya otot adalah gaya yang dihasilkan oleh kontraksi otot tubuh manusia/hewan saat mendorong atau menarik."
+            },
+            {
+                id: 11,
+                category: "Bab 2: Gaya",
+                question: "Bola basket yang dilempar tinggi ke atas selalu jatuh kembali menuju permukaan tanah. Gaya yang menyebabkan bola tersebut selalu jatuh ke bawah adalah ...",
+                options: [
+                    "gaya gravitasi",
+                    "gaya gesek",
+                    "gaya otot",
+                    "gaya magnet"
+                ],
+                answer: 0,
+                explanation: "Gaya gravitasi bumi menarik semua benda bermassa menuju ke pusat bumi."
+            },
+            {
+                id: 12,
+                category: "Bab 2: Gaya",
+                question: "Ketika Ian dan Mia bersepeda di jalan tanah yang basah, alur ban sepeda mereka bergesekan langsung dengan permukaan tanah. Gaya yang timbul akibat sentuhan antara dua permukaan benda tersebut adalah ...",
+                options: [
+                    "gaya magnet",
+                    "gaya otot",
+                    "gaya gesek",
+                    "gaya gravitasi"
+                ],
+                answer: 2,
+                explanation: "Gaya gesek muncul ketika dua permukaan benda saling bersentuhan berlawanan arah."
+            },
+            {
+                id: 13,
+                category: "Bab 2: Pengaruh Gaya",
+                question: "Seorang perajin menekan dan meremas tanah liat hingga terbentuk sebuah pot bunga yang indah. Pengaruh gaya yang terjadi pada peristiwa tersebut adalah ...",
+                options: [
+                    "gaya mengubah bentuk benda",
+                    "gaya membuat benda diam menjadi bergerak",
+                    "gaya menghentikan gerak benda",
+                    "gaya mengubah arah gerak benda"
+                ],
+                answer: 0,
+                explanation: "Tekanan dan remasan dari gaya otot merubah struktur fisik tanah liat yang semula tidak beraturan menjadi pot bunga."
+            },
+            {
+                id: 14,
+                category: "Bab 2: Magnet",
+                question: "Aga mendekatkan dua batang magnet dengan kutub yang senama (Utara dengan Utara). Hal yang akan terjadi pada kedua magnet tersebut adalah ...",
+                options: [
+                    "saling tarik-menarik dengan kuat",
+                    "saling tolak-menolak",
+                    "menempel satu sama lain",
+                    "tidak terjadi reaksi apa pun"
+                ],
+                answer: 1,
+                explanation: "Kutub magnet yang senama/sejenis (Utara-Utara / Selatan-Selatan) akan saling tolak-menolak."
+            },
+            {
+                id: 15,
+                category: "Bab 2: Gaya Gesek",
+                question: "Pada saat musim hujan, jalur tanah yang dilewati sepeda menjadi licin sehingga gaya gesek antara ban dan tanah berkurang. Dampak dari berkurangnya gaya gesek tersebut adalah ...",
+                options: [
+                    "sepeda bergerak semakin lambat dan mudah dihentikan",
+                    "sepeda lebih mudah tergelincir dan sulit dikendalikan",
+                    "bentuk ban sepeda akan berubah lebih pipih",
+                    "sepeda akan tertarik otomatis ke atas"
+                ],
+                answer: 1,
+                explanation: "Gaya gesek yang kecil pada permukaan licin membuat cengkeraman roda berkurang sehingga mudah tergelincir."
+            },
+
+            // Bab 3: Peta & Bentang Alam
+            {
+                id: 16,
+                category: "Bab 3: Komponen Peta",
+                question: "Pada sebuah peta, terdapat kolom khusus yang memuat penjelasan mengenai arti dari berbagai simbol gambar dan warna yang digunakan. Komponen peta tersebut dinamakan ...",
+                options: [
+                    "judul peta",
+                    "skala peta",
+                    "legenda",
+                    "garis astronomis"
+                ],
+                answer: 2,
+                explanation: "Legenda adalah keterangan rincian simbol-simbol (jalan, sungai, kota) yang terdapat pada peta."
+            },
+            {
+                id: 17,
+                category: "Bab 3: Jenis Peta",
+                question: "Peta yang disimpan dan ditampilkan melalui perangkat elektronik seperti komputer atau ponsel pintar sehingga dapat diperbesar atau dicari rutenya dinamakan ...",
+                options: [
+                    "peta konvensional",
+                    "peta timbul",
+                    "peta digital",
+                    "denah rumah"
+                ],
+                answer: 2,
+                explanation: "Peta digital adalah peta berbasis data elektronik yang diakses lewat gawai/komputer (misal: Google Maps)."
+            },
+            {
+                id: 18,
+                category: "Bab 3: Komponen Peta",
+                question: "Unsur penunjuk arah mata angin pada peta sangat penting digunakan untuk ...",
+                options: [
+                    "menentukan harga dan luas wilayah",
+                    "menunjukkan arah utara, selatan, timur, dan barat suatu lokasi",
+                    "menghitung jumlah penduduk di daerah tersebut",
+                    "mengukur ketebalan tanah pada peta"
+                ],
+                answer: 1,
+                explanation: "Orientasi/arah mata angin memberikan acuan posisi kardinal (Utara, Selatan, Timur, Barat)."
+            },
+            {
+                id: 19,
+                category: "Bab 3: Bentang Alam",
+                question: "Bentang alam dibedakan menjadi wilayah daratan dan perairan. Berikut ini yang seluruhnya termasuk dalam bentang alam daratan adalah ...",
+                options: [
+                    "danau, laut, dan sungai",
+                    "gunung, pegunungan, dan dataran rendah",
+                    "pantai, selat, dan lembah",
+                    "teluk, rawa, dan bukit"
+                ],
+                answer: 1,
+                explanation: "Gunung, pegunungan, dan dataran rendah berada sepenuhnya di wilayah relief daratan."
+            },
+            {
+                id: 20,
+                category: "Bab 3: Bentang Alam Perairan",
+                question: "Cekungan luas di permukaan bumi wilayah daratan yang tergenang oleh air dinamakan ...",
+                options: [
+                    "laut",
+                    "danau",
+                    "selat",
+                    "sungai"
+                ],
+                answer: 1,
+                explanation: "Danau adalah genangan air yang amat luas yang dikelilingi oleh daratan."
+            },
+            {
+                id: 21,
+                category: "Bab 3: Bentang Alam Perairan",
+                question: "Bentang alam berupa kumpulan air asin yang sangat luas dan menghubungkan antarpulau atau antardaratan dinamakan ...",
+                options: [
+                    "laut",
+                    "sungai",
+                    "danau",
+                    "rawa"
+                ],
+                answer: 0,
+                explanation: "Laut adalah perairan air asin luas yang memisahkan daratan atau pulau."
+            },
+            {
+                id: 22,
+                category: "Bab 4: Struktur Bumi",
+                question: "Lapisan Bumi terdiri atas beberapa bagian dari luar ke dalam. Urutan struktur lapisan Bumi yang benar adalah ...",
+                options: [
+                    "inti dalam, inti luar, mantel, kerak",
+                    "kerak, mantel, inti luar, dan inti dalam",
+                    "mantel, kerak, inti dalam, inti luar",
+                    "inti luar, kerak, mantel, inti dalam"
+                ],
+                answer: 1,
+                explanation: "Struktur bumi dari paling luar ke dalam: Kerak bumi -> Mantel bumi -> Inti luar -> Inti dalam."
+            },
+            {
+                id: 23,
+                category: "Bab 4: Tenaga Pembentuk Bumi",
+                question: "Tenaga pembentuk permukaan bumi yang berasal dari dalam bumi seperti aktivitas magma dan pergerakan lempeng dinamakan ...",
+                options: [
+                    "tenaga eksogen",
+                    "tenaga endogen",
+                    "tenaga gravitasional",
+                    "tenaga atmosfer"
+                ],
+                answer: 1,
+                explanation: "Tenaga endogen adalah tenaga perombak bumi yang berasal dari dalam interior bumi (vulkanisme, tektonisme)."
+            },
+            {
+                id: 24,
+                category: "Bab 4: Tenaga Pembentuk Bumi",
+                question: "Bentang alam seperti pantai dan jurang sungai yang terbentuk akibat pengikisan oleh gelombang air laut atau aliran air hujan dipengaruhi oleh ...",
+                options: [
+                    "tenaga endogen dari dalam bumi",
+                    "tenaga eksogen dari luar bumi",
+                    "pergerakan inti dalam bumi",
+                    "tarikan magnet bumi"
+                ],
+                answer: 1,
+                explanation: "Tenaga eksogen berasal dari luar bumi seperti air, angin, dan cuaca yang mengikis permukaan bumi."
+            },
+            {
+                id: 25,
+                category: "Bab 4: Dinamika Lempeng",
+                question: "Pergerakan dua lempeng Bumi yang saling mendekat dan bertubrukan satu sama lain dinamakan pergerakan lempeng ...",
+                options: [
+                    "divergen",
+                    "konvergen",
+                    "transform",
+                    "vertikal"
+                ],
+                answer: 1,
+                explanation: "Gerak Konvergen adalah pergerakan lempeng tektonik yang saling mendekat/bertubrukan."
+            },
+            {
+                id: 26,
+                category: "Bab 4: Dinamika Lempeng",
+                question: "Ketika dua lempeng Bumi bergerak saling menjauh sehingga membentuk celah atau retakan baru di dasar laut, pergerakan tersebut dinamakan ...",
+                options: [
+                    "konvergen",
+                    "transform",
+                    "divergen",
+                    "sirkular"
+                ],
+                answer: 2,
+                explanation: "Gerak Divergen terjadi saat lempeng tektonik bergerak saling menjauh."
+            },
+            {
+                id: 27,
+                category: "Bab 4: Bentang Alam",
+                question: "Salah satu bentang alam yang dapat terbentuk akibat adanya tumbukan lempeng secara konvergen adalah ...",
+                options: [
+                    "dataran rendah",
+                    "jajaran gunung api atau pegunungan",
+                    "delta sungai",
+                    "terumbu karang"
+                ],
+                answer: 1,
+                explanation: "Tumbukan lempeng (konvergen) tertekan ke atas membentuk lipatan berupa pegunungan tinggi atau gunung api."
+            },
+
+            // Bab 4: Iklim, Cuaca & Lingkungan
+            {
+                id: 28,
+                category: "Bab 4: Iklim & Cuaca",
+                question: "Perbedaan utama antara musim/cuaca dengan iklim terletak pada ...",
+                options: [
+                    "jenis alat ukur yang digunakan",
+                    "jangka waktu pengamatan dan luas wilayahnya",
+                    "jenis pakaian yang digunakan masyarakat",
+                    "jumlah vegetasi tanaman di daerah tersebut"
+                ],
+                answer: 1,
+                explanation: "Cuaca terjadi di wilayah sempit & waktu singkat, sedangkan iklim melingkupi wilayah luas dalam kurun waktu sangat lama (30 tahun)."
+            },
+            {
+                id: 29,
+                category: "Bab 4: Iklim Indonesia",
+                question: "Indonesia berada di lintang khatulistiwa sehingga memiliki iklim tropis. Dua musim utama yang terjadi di Indonesia adalah ...",
+                options: [
+                    "musim panas dan musim dingin",
+                    "musim hujan dan musim kemarau",
+                    "musim semi dan musim gugur",
+                    "musim salju dan musim kencang"
+                ],
+                answer: 1,
+                explanation: "Negara beriklim tropis seperti Indonesia umumnya mengalami 2 musim: kemarau dan hujan."
+            },
+            {
+                id: 30,
+                category: "Bab 4: Pelestarian Lingkungan",
+                question: "Salah satu tindakan nyata yang dapat dilakukan oleh siswa untuk memitigasi dampak perubahan iklim di lingkungan sekolah adalah ...",
+                options: [
+                    "membakar sampah plastik di halaman sekolah",
+                    "menanam pohon dan merawat tanaman di sekitar sekolah",
+                    "menebang pohon yang teduh",
+                    "membiarkan keran air mengalir terus-menerus"
+                ],
+                answer: 1,
+                explanation: "Penanaman pohon menyerap gas CO2 pembawa pemanasan global."
+            },
+            {
+                id: 31,
+                category: "Bab 4: Perubahan Iklim",
+                question: "Peristiwa terperangkapnya gelombang panas matahari di dalam atmosfer bumi oleh gas-gas emisi seperti karbon dioksida dinamakan ...",
+                options: [
+                    "efek rumah kaca",
+                    "kondensasi udara",
+                    "evaporasi laut",
+                    "penyaringan ozon"
+                ],
+                answer: 0,
+                explanation: "Efek rumah kaca merangkap panas teradiasi balik dari tanah sehingga suhu atmosfer naik."
+            },
+            {
+                id: 32,
+                category: "Bab 4: Perubahan Iklim",
+                question: "Meningkatnya gas rumah kaca secara berlebihan di atmosfer akibat aktivitas manusia menyebabkan dampak buruk berupa ...",
+                options: [
+                    "suhu bumi menjadi semakin dingin",
+                    "mencairnya es di kawasan kutub dan kenaikan permukaan air laut",
+                    "berkurangnya curah hujan di seluruh dunia secara permanen",
+                    "menurunnya tingkat penguapan air laut"
+                ],
+                answer: 1,
+                explanation: "Pemanasan global mencairkan es kutub sehingga volume air laut naik memicu banjir rob."
+            },
+            {
+                id: 33,
+                category: "Bab 4: Perubahan Iklim",
+                question: "Tindakan berikut yang termasuk upaya mengurangi jejak karbon (carbon footprint) dalam kehidupan sehari-hari adalah ...",
+                options: [
+                    "mengendarai kendaraan bermotor untuk jarak yang sangat dekat",
+                    "mematikan lampu dan alat elektronik yang tidak digunakan",
+                    "menggunakan kantong plastik sekali pakai secara berlebihan",
+                    "membiarkan pendingin ruangan menyala saat ruangan kosong"
+                ],
+                answer: 1,
+                explanation: "Hemat listrik menurunkan pemakaian beban PLTU pembakar batu bara penghasil karbon."
+            },
+
+            // Soal Tambahan 34 - 40 (Melengkapi hingga 40 Soal Standar Asesmen)
+            {
+                id: 34,
+                category: "Bab 2: Magnet",
+                question: "Benda-benda di sekitar kita yang dapat ditarik dengan kuat oleh batang magnet umumnya terbuat dari bahan ...",
+                options: [
+                    "kayu dan plastik",
+                    "besi dan baja",
+                    "kaca dan kain",
+                    "karet dan kertas"
+                ],
+                answer: 1,
+                explanation: "Besi dan baja merupakan benda feromagnetik yang ditarik kuat oleh magnet."
+            },
+            {
+                id: 35,
+                category: "Bab 2: Gaya Pegas",
+                question: "Saat seseorang menggunakan ketapel untuk melontarkan batu kecil, jenis gaya yang dimanfaatkan pada tali karet ketapel tersebut adalah ...",
+                options: [
+                    "gaya pegas",
+                    "gaya gravitasi",
+                    "gaya gesek",
+                    "gaya listrik"
+                ],
+                answer: 0,
+                explanation: "Karet ketapel bersifat elastis, sehingga menghasilkan gaya pegas ketika ditarik dan dilepaskan."
+            },
+            {
+                id: 36,
+                category: "Bab 3: Skala Peta",
+                question: "Skala pada peta tertulis 1 : 100.000. Artinya adalah ...",
+                options: [
+                    "1 cm pada peta mewakili 100.000 cm (atau 1 km) jarak sebenarnya di lapangan",
+                    "1 km pada peta mewakili 100 cm pada lokasi sebenarnya",
+                    "Jarak di peta 100 kali lebih besar daripada jarak sebenarnya",
+                    "Peta dibuat sepanjang 100.000 meter"
+                ],
+                answer: 0,
+                explanation: "Skala 1:100.000 berarti setiap ukuran 1 cm di gambar peta mewakili 100.000 cm (1 kilometer) kondisi nyata."
+            },
+            {
+                id: 37,
+                category: "Bab 3: Bentang Alam Daratan",
+                question: "Daratan luas yang berada pada ketinggian di atas 600 meter di atas permukaan laut dinamakan ...",
+                options: [
+                    "dataran rendah",
+                    "dataran tinggi (plato)",
+                    "lembah",
+                    "pantai"
+                ],
+                answer: 1,
+                explanation: "Dataran tinggi terletak pada elevasi tinggi di atas 600 m dpl dengan suhu sejuk."
+            },
+            {
+                id: 38,
+                category: "Bab 4: Gunung Api",
+                question: "Cairan magma sangat panas yang keluar sampai ke permukaan bumi saat gunung berapi meletus dinamakan ...",
+                options: [
+                    "lava",
+                    "kawah",
+                    "lahar dingin",
+                    "kerak bumi"
+                ],
+                answer: 0,
+                explanation: "Magma yang berhasil keluar menerobos ke permukaan bumi disebut lava."
+            },
+            {
+                id: 39,
+                category: "Bab 4: Gempa Bumi",
+                question: "Getaran hebat di permukaan bumi yang disebabkan oleh pergeseran lempeng tektonik atau aktivitas gunung api dinamakan ...",
+                options: [
+                    "tsunami",
+                    "gempa bumi",
+                    "angin puting beliung",
+                    "banjir bandang"
+                ],
+                answer: 1,
+                explanation: "Gempa bumi terjadi akibat pelepasan energi gelombang seismik dari rekahan/pergeseran lempeng."
+            },
+            {
+                id: 40,
+                category: "Bab 4: Mitigasi Bencana",
+                question: "Hal utama yang harus kita lakukan saat berada di dalam ruangan kelas ketika tiba-tiba terjadi gempa bumi adalah ...",
+                options: [
+                    "berdiri di dekat jendela kaca",
+                    "berlindung di bawah meja yang kokoh dan melindungi kepala",
+                    "berebut berlari di pintu keluar",
+                    "memanjat lemari buku"
+                ],
+                answer: 1,
+                explanation: "Prinsip dasar keselamatan gempa: Drop, Cover, Hold On (Berlindung di bawah meja kokoh & lindungi kepala)."
+            }
+        ];
+
+        // Application State Variables
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(questionsData.length).fill(null);
+        let quizMode = 'practice';
+        let timerInterval = null;
+        let timeLeft = 40 * 60; // 40 minutes in seconds
+
+        // HTML Elements Reference
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const categoryBadge = document.getElementById('question-category');
+        const currentQuestionNum = document.getElementById('current-question-num');
+        const progressBar = document.getElementById('progress-bar');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const btnFinish = document.getElementById('btn-finish');
+        const feedbackBox = document.getElementById('feedback-box');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackText = document.getElementById('feedback-text');
+        const timerBox = document.getElementById('timer-box');
+        const timerText = document.getElementById('timer-text');
+
+        // Functions
+        function startQuiz() {
+            const nameInput = document.getElementById('student-name').value.trim();
+            if (!nameInput) {
+                alert("Silakan masukkan nama siswa terlebih dahulu!");
+                return;
+            }
+
+            quizMode = document.getElementById('quiz-mode').value;
+            welcomeScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+
+            if (quizMode === 'exam') {
+                timerBox.classList.remove('hidden');
+                timerBox.classList.add('flex');
+                startTimer();
+            } else {
+                timerBox.classList.add('hidden');
+            }
+
+            loadQuestion(0);
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const min = Math.floor(timeLeft / 60);
+                const sec = timeLeft % 60;
+                timerText.textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Waktu ujian telah habis!");
+                    finishQuiz();
+                }
+            }, 1000);
+        }
+
+        function loadQuestion(index) {
+            currentQuestionIndex = index;
+            const q = questionsData[index];
+
+            categoryBadge.textContent = q.category;
+            currentQuestionNum.textContent = index + 1;
+            questionText.textContent = `${index + 1}. ${q.question}`;
+            
+            // Progress bar update
+            const progressPercent = ((index + 1) / questionsData.length) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+
+            // Clear previous options
+            optionsContainer.innerHTML = '';
+            feedbackBox.classList.add('hidden');
+
+            // Render Options
+            const labels = ['A', 'B', 'C', 'D'];
+            q.options.forEach((opt, optIdx) => {
+                const isSelected = userAnswers[index] === optIdx;
+                let btnStyle = "bg-white border-slate-200 text-slate-700 hover:border-indigo-400";
+                
+                if (isSelected) {
+                    if (quizMode === 'practice') {
+                        btnStyle = optIdx === q.answer 
+                            ? "bg-emerald-50 border-emerald-500 text-emerald-800 font-bold" 
+                            : "bg-red-50 border-red-500 text-red-800 font-bold";
+                    } else {
+                        btnStyle = "bg-indigo-50 border-indigo-600 text-indigo-900 font-bold ring-2 ring-indigo-500/20";
+                    }
+                }
+
+                const optButton = document.createElement('button');
+                optButton.className = `option-btn w-full p-4 rounded-xl border-2 text-left text-sm sm:text-base font-medium flex items-center gap-3 ${btnStyle}`;
+                optButton.onclick = () => selectOption(optIdx);
+
+                optButton.innerHTML = `
+                    <span class="w-8 h-8 rounded-lg border font-bold flex items-center justify-center shrink-0 ${isSelected ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-100 text-slate-600 border-slate-300'}">
+                        ${labels[optIdx]}
+                    </span>
+                    <span class="flex-grow">${opt}</span>
+                `;
+
+                optionsContainer.appendChild(optButton);
+            });
+
+            // Practice Mode Feedback
+            if (quizMode === 'practice' && userAnswers[index] !== null) {
+                showFeedback(userAnswers[index] === q.answer, q.explanation);
+            }
+
+            // Navigation Buttons Control
+            btnPrev.disabled = index === 0;
+            if (index === questionsData.length - 1) {
+                btnNext.classList.add('hidden');
+                btnFinish.classList.remove('hidden');
+            } else {
+                btnNext.classList.remove('hidden');
+                btnFinish.classList.add('hidden');
+            }
+        }
+
+        function selectOption(optIdx) {
+            userAnswers[currentQuestionIndex] = optIdx;
+            const q = questionsData[currentQuestionIndex];
+
+            if (quizMode === 'practice') {
+                showFeedback(optIdx === q.answer, q.explanation);
+            }
+            
+            // Reload to apply visual state
+            loadQuestion(currentQuestionIndex);
+        }
+
+        function showFeedback(isCorrect, explanationText) {
+            feedbackBox.classList.remove('hidden', 'bg-emerald-50', 'border-emerald-200', 'bg-red-50', 'border-red-200');
+            
+            if (isCorrect) {
+                feedbackBox.classList.add('bg-emerald-50', 'border-emerald-200');
+                feedbackTitle.className = "font-bold text-emerald-700 flex items-center gap-2 mb-1";
+                feedbackTitle.innerHTML = `<i class="fa-solid fa-circle-check"></i> Jawaban Benar!`;
+            } else {
+                feedbackBox.classList.add('bg-red-50', 'border-red-200');
+                feedbackTitle.className = "font-bold text-red-700 flex items-center gap-2 mb-1";
+                feedbackTitle.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Jawaban Kurang Tepat`;
+            }
+
+            feedbackText.textContent = explanationText;
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                loadQuestion(currentQuestionIndex - 1);
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questionsData.length - 1) {
+                loadQuestion(currentQuestionIndex + 1);
+            }
+        }
+
+        function confirmFinish() {
+            const unanswered = userAnswers.filter(a => a === null).length;
+            if (unanswered > 0) {
+                if (!confirm(`Masih ada ${unanswered} soal yang belum dijawab. Yakin ingin mengakhiri kuis?`)) {
+                    return;
+                }
+            }
+            finishQuiz();
+        }
+
+        function finishQuiz() {
+            if (timerInterval) clearInterval(timerInterval);
+
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            // Calculate Score
+            let correctCount = 0;
+            questionsData.forEach((q, idx) => {
+                if (userAnswers[idx] === q.answer) {
+                    correctCount++;
+                }
+            });
+
+            const wrongCount = questionsData.length - correctCount;
+            const finalScore = Math.round((correctCount / questionsData.length) * 100);
+
+            // Fill Result Info
+            document.getElementById('res-name').textContent = document.getElementById('student-name').value || "Siswa";
+            document.getElementById('res-correct').textContent = correctCount;
+            document.getElementById('res-wrong').textContent = wrongCount;
+            document.getElementById('res-score').textContent = finalScore;
+            document.getElementById('score-badge').textContent = finalScore;
+
+            // Score badge color & message
+            const scoreBadge = document.getElementById('score-badge');
+            const resTitle = document.getElementById('result-title');
+
+            if (finalScore >= 85) {
+                scoreBadge.className = "w-24 h-24 rounded-full mx-auto flex items-center justify-center text-3xl font-extrabold text-white shadow-lg mb-4 bg-emerald-500";
+                resTitle.textContent = "Sangat Luar Biasa! 🎉";
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            } else if (finalScore >= 70) {
+                scoreBadge.className = "w-24 h-24 rounded-full mx-auto flex items-center justify-center text-3xl font-extrabold text-white shadow-lg mb-4 bg-blue-500";
+                resTitle.textContent = "Bagus Sekali! 👍";
+            } else {
+                scoreBadge.className = "w-24 h-24 rounded-full mx-auto flex items-center justify-center text-3xl font-extrabold text-white shadow-lg mb-4 bg-amber-500";
+                resTitle.textContent = "Tetap Semangat Belajar! 💪";
+            }
+
+            renderReviewList();
+        }
+
+        function renderReviewList() {
+            const reviewContainer = document.getElementById('review-content');
+            reviewContainer.innerHTML = '';
+            const labels = ['A', 'B', 'C', 'D'];
+
+            questionsData.forEach((q, idx) => {
+                const userAns = userAnswers[idx];
+                const isCorrect = userAns === q.answer;
+
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-xl border ${isCorrect ? 'bg-emerald-50/50 border-emerald-200' : 'bg-red-50/50 border-red-200'}`;
+
+                card.innerHTML = `
+                    <div class="flex items-start justify-between gap-2 mb-2">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded ${isCorrect ? 'bg-emerald-200 text-emerald-800' : 'bg-red-200 text-red-800'}">
+                            Soal #${idx + 1} - ${isCorrect ? 'BENAR' : 'SALAH'}
+                        </span>
+                        <span class="text-xs text-slate-500 font-semibold">${q.category}</span>
+                    </div>
+                    <p class="font-bold text-slate-800 text-sm mb-3">${q.question}</p>
+                    <div class="space-y-1 mb-3 text-xs sm:text-sm">
+                        <div class="font-medium ${userAns === q.answer ? 'text-emerald-700 font-bold' : 'text-red-600'}">
+                            Jawaban Anda: ${userAns !== null ? labels[userAns] + '. ' + q.options[userAns] : '<i>Belum Dijawab</i>'}
+                        </div>
+                        <div class="text-emerald-800 font-bold">
+                            Kunci Jawaban: ${labels[q.answer]}. ${q.options[q.answer]}
+                        </div>
+                    </div>
+                    <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-xs text-slate-600">
+                        <strong>Pembahasan:</strong> ${q.explanation}
+                    </div>
+                `;
+
+                reviewContainer.appendChild(card);
+            });
+        }
+
+        function toggleReviewModal() {
+            const modal = document.getElementById('review-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        function restartQuiz() {
+            userAnswers = new Array(questionsData.length).fill(null);
+            currentQuestionIndex = 0;
+            timeLeft = 40 * 60;
+            if (timerInterval) clearInterval(timerInterval);
+
+            resultScreen.classList.add('hidden');
+            welcomeScreen.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
